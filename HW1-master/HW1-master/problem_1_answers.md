@@ -4,6 +4,9 @@ http://www.w3schools.com/tags/att_th_colspan.asp
 
 
 2.
+
+See: https://dl.dropboxusercontent.com/u/14868427/q1part2_styles.png for CSS & HTML
+
 The only HTML attribute for the header is align="center", which aligns the middle of text to the center of the screen, centering it.
 http://www.w3schools.com/tags/tag_th.asp
 
