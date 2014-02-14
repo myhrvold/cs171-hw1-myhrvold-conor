@@ -4,7 +4,6 @@ http://www.w3schools.com/tags/att_th_colspan.asp
 
 
 2.
-
 See: https://dl.dropboxusercontent.com/u/14868427/q1part2_styles.png for CSS & HTML
 
 The only HTML attribute for the header is align="center", which aligns the middle of text to the center of the screen, centering it.
@@ -33,12 +32,12 @@ vertical-align in th -- aligns elements w/ respect to vertical axis
 http://www.w3schools.com/cssref/pr_pos_vertical-align.asp
 
 
-3. DOM inspector vs. html source
+3. DOM inspector vs. HTML source
 
 The DOM inspector shows you the page as it is actually rendered, with the DOM hierarchy and the results of JavaScript which brings interaction to the page.
 
-The html source code shows you the how the page is created to make the resulting DOM hierarchy.
+The HTML source code shows you the how the page is created to make the resulting DOM hierarchy.
 
-You want the source code to see how to make something (what you have to statically type as code to get a resulting dynamicism of the html page.)
+You want the source code to see how to make something (what you have to statically type as code to get a resulting dynamicism of the HTML page.)
 
-You want the DOM inspector if you want to see the live properties of a feature resulting from the html code, such as what the effects on an element are from inheritance and other attributes which affect that element. (Since it's hard to visualize what will happen from just seeing the html code as it can be complex to work out.)
+You want the DOM inspector if you want to see the live properties of a feature resulting from the HTML code, such as what the effects on an element are from inheritance and other attributes which affect that element. (Since it's hard to visualize what will happen from just seeing the HTML code as it can be complex to work out.)
