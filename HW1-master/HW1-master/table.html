@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>CS171 Homework 1</title>
+
+  <style type="text/css">
+  /* Conor Myhrvold -- CSS & Code */
+  
+  header {
+    font-style: verdana-md ;
+    font-size:8px;    
+    position: absolute;
+    top: 0 px;
+    }
+    
+  caption {
+    caption-side: top;
+    border: solid;
+    border-color: #808080; /* light gray */
+    border-width: 2px;
+    }
+    
+  table {
+    margin-left:auto; 
+    margin-right:auto;
+    border: solid;
+    border-color: #808080;
+    border-width: 2px;
+    top: 0 px;
+  }  
+  table.cell {
+    border-style: solid;
+    border-color: #808080;
+    border-width: 2px;
+    }
+  
+  body {
+    background-color: white;
+    text-align:center;}
+  
+  td, th {
+  border: solid 1px lightgray;
+}
+  </style>
+</head>
+<body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script>
+  
+  //declare global variables so they're accessible in console
+  var data;
+  var ascendflag ; //flag for cursor, state, rate/rank
+  var width = 30 ;
+  var height = 10 ;
+  var rows ;
+  var max_data ;
+  var min_data ;
+  
+  //declare global function to display up or down cursor arrow depending on if clicking header cell will sort in
+  //ascending or descending order  
+  function cursorfunc(ascendflag) { if(ascendflag==0) { return d3.select("thead").style("cursor","s-resize") ;} //sw-resize shows change
+                          else if(ascendflag==1) { return d3.select("thead").style("cursor","n-resize") ;} //nw-resize shows change
+                        }; 
+  
+  //declare global variable function to sort data upon loading (similar to ratesort in functions section)
+  var ratesortfunc = function(rows,i) { rows.sort(function(a,b) {return parseFloat(a[2])==parseFloat(b[2]) ? 
+                                     d3.ascending(a[1],b[1]) : d3.ascending(parseFloat(a[2]),parseFloat(b[2])) ;})
+                                        ; ascendflag = 1 ; cursorfunc(ascendflag) };                            
+                                        
+  //insert header
+  d3.select("body").insert("h1").text("Unemployment Rates for States");                   
+  
+  //now declare function that data is loaded in -- can't access data outside of this function
+  d3.text("unemp_states_us_nov_2013.tsv", function(text){
+  
+      data = d3.tsv.parseRows(text) ;
+      
+      var table = d3.select("body").insert("table") ; //insert instead of append to dictate DOM location
+      var caption = table.append("caption") ;
+      var thead = table.append("thead") ;
+      var tbody = table.append("tbody") ;
+                
+      caption = caption.html("<b>Unemployment Rates for States<br>Monthly Rankings<br>Seasonally Adjusted<br>Dec. 2013<sup>p</sup><br></b>") //copied from website: http://www.bls.gov/web/laus/laumstrk.htm  (used 'inspect element') 
+                    
+      var headers = thead.selectAll("th") //binding data & inserting text
+                         .data(data[0])
+                         .enter()
+                         .append("th")
+                         .text(function(d) {return d;}); //printing header
+
+      var rows = tbody.selectAll("tr")
+                      .data(data.slice(1,data.length))
+                      .enter()
+                      .append("tr") ;
+                      
+      var cells = rows.selectAll("td")
+                      .data(function(row) {return d3.range(Object.keys(row).length).map(function(column,i) 
+                           {return row[Object.keys(row)[i]];});})                   
+                      .enter()
+                      .append("td")
+                      .text(function(d) {return d ;}) ;         
+      ratesortfunc(rows,2) ; //sort data in ascending order
+
+      min_data = parseFloat(d3.values(data)[1][2]) ; //since data sorted, 2nd column of 1st entry will be min rate value
+      max_data = parseFloat(d3.values(data)[data.length-1][2]) ; // and 2nd column last entry will be max rate value
+      var color = d3.scale.linear() //added for problem 4
+                    .domain([min_data,max_data]) //have your scale go from min to max
+                    .interpolate(d3.interpolateRgb)
+                    .range(["orangered", "silver"]) ;      
+ 
+      var barcol = rows.insert("td").attr("col",3).append("svg") //added for problem 4
+                       .attr("width", width)
+                       .attr("height", height)
+                       .append("rect")
+                       .attr("height", height)
+                       .attr("width", function(d) { return parseFloat(d[0]); }) ;
+      
+      cells = rows.selectAll("td") ; //adds new row to cells so yellow higtlight works
+      
+      thead.insert("td").text("Bars").style("font-weight","bold") ;
+       
+      function zebra_stripes_func(rows) { rows.attr('bgcolor', function(d,i) { //make zebra stripes
+                                            if (i%2==0){return 'lightgray';} 
+                                            else {return 'white';} //white already default background now, but not always case...
+                                        }) ;} ;                    
+      zebra_stripes_func(rows) ; //call function to implement zebra stripes
+    
+      //functions to select columns and rows for mouseover options
+      var col_select = function(col,color) { d3.selectAll('[col="'+col+'"]').attr("bgcolor", color);} ;      
+      var row_select = function(rows,color) { d3.selectAll('[row="'+rows+'"]').attr("bgcolor", color);} ;
+   
+      cells.attr("col", function(d,i) {return i;})
+           .attr("row", function(d,i,j) {return j;})
+           .on("mouseover", function(d,i,j) { col_select(i,'yellow'); row_select(j,'yellow');}) //make row & column yellow  
+           .on("mouseout",  function(d,i,j) { col_select(i,null); row_select(j,null); zebra_stripes_func(rows) ;}) ; //undo yellow & redo zebra stripes                     
+  
+      rows.selectAll("[col='2']").style("background-color", color) ;
+      
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//Sorting Functions Live Below This Line
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                      
+      
+      thead.selectAll("th").on("click", function(d,i) {return i==1? statesort(d,i): ratesort(d,i) ; });
+      
+      //use 0&1 flags to switch and if & else statements ... use same functions except 'descending' instead of 'ascending'
+      function statesort(d,i) {
+        if(ascendflag==1){
+            rows.sort(function(a,b) {return d3.descending(a[1],b[1]);});
+        ascendflag = 0 ;
+        zebra_stripes_func(rows) ;
+        cursorfunc(ascendflag) ; 
+        }
+        else if(ascendflag==0){
+             rows.sort(function(a,b) {return d3.ascending(a[1],b[1]);});
+        ascendflag = 1 ;
+        zebra_stripes_func(rows) ; 
+        cursorfunc(ascendflag) ;
+        }   
+      };
+      
+      function ratesort(d,i) {
+        if(ascendflag==1){
+            rows.sort(function(a,b) {return parseFloat(a[2])==parseFloat(b[2]) ? 
+                      d3.descending(a[1],b[1]) : d3.descending(parseFloat(a[2]),parseFloat(b[2])) ;});                             
+        ascendflag = 0 ;
+        zebra_stripes_func(rows) ;
+        cursorfunc(ascendflag) ; 
+        }
+        else if(ascendflag==0){
+             rows.sort(function(a,b) {return d3.ascending(parseFloat(a[2]),parseFloat(b[2]));});
+        ascendflag = 1 ;
+        zebra_stripes_func(rows) ; 
+        cursorfunc(ascendflag) ; 
+        }   
+      };
+  
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//You have reached the border of the state of Sorting. In scoping things out, you are now going global!
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                                                                         
+      //put text at bottom of page
+      d3.select("body").insert("p")
+                       .html("<text> <sup>p</sup> = preliminary. </text>");                   
+      d3.select("body").insert("p")
+                       .html("<text> <b>NOTE:</b> Rates shown are a percentage of the labor force. Data refer to place of residence. Estimates for the current month are subject to revision the following month. </text>");                   
+      d3.select("body").insert("p")
+                       .html("<text> <b>Data Source:</b> <a href= http://www.bls.gov/web/laus/laumstrk.htm>US Bureau of Labor</a> </text>")
+      });
+  </script>
+</body>
+</html>
