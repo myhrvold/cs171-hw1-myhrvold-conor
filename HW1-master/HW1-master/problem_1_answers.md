@@ -1,9 +1,9 @@
-1.
+<b>1.</b>
 The colspan="3" attribute creates 3 columns (Rank, State, Rate in this example).
 http://www.w3schools.com/tags/att_th_colspan.asp
 
 
-2.
+<b>2.</b>
 See: https://dl.dropboxusercontent.com/u/14868427/q1part2_styles.png for CSS & HTML
 
 The only HTML attribute for the header is align="center", which aligns the middle of text to the center of the screen, centering it.
