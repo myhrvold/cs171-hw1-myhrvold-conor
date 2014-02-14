@@ -32,7 +32,7 @@ vertical-align in th -- aligns elements w/ respect to vertical axis
 http://www.w3schools.com/cssref/pr_pos_vertical-align.asp
 
 
- 3. DOM inspector vs. HTML source
+<b>3. DOM inspector vs. HTML source</b>
 
 The DOM inspector shows you the page as it is actually rendered, with the DOM hierarchy and the results of JavaScript which brings interaction to the page.
 
